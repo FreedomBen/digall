@@ -7,7 +7,7 @@ You have a few different options for how you can run it
 You can download it as a script file with `wget` by running this command:
 
 ```bash
-wget https://gist.github.com/FreedomBen/b02d856c12d6510ed35f350a33b42164/raw/285e84dd7855e693ded646bdce7f2019adcb2f86/digall.sh \
+wget https://raw.githubusercontent.com/FreedomBen/digall/main/digall \
   && chmod digall.sh
 ```
 
