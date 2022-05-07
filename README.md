@@ -8,7 +8,7 @@ You can download it as a script file with `wget` by running this command:
 
 ```bash
 wget https://raw.githubusercontent.com/FreedomBen/digall/main/digall \
-  && chmod digall.sh
+  && chmod +x digall
 ```
 
 Now use it with whatever domains you like:
