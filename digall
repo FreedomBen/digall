@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+declare -rx color_restore='\033[0m'
+declare -rx color_red='\033[0;31m'
+declare -rx color_light_green='\033[1;32m'
+declare -rx color_light_blue='\033[1;34m'
+declare -rx color_light_cyan='\033[1;36m'
+
+if [ -z "$1" ]; then
+  echo -e "${color_red}Error: Please pass domain as first arg${color_restore}"
+else
+  echo -e "${color_light_blue}Queries: (dig +noall +answer '$1' '<type>')...${color_light_cyan}\n"
+  # Note that CNAME doesn't work, which is why it's not here.
+  # CNAME isn't needed because it will show up as the other record types
+  for t in SOA NS SPF TXT MX AAAA A; do
+    echo -e "${color_light_green}Querying for $t records...${color_restore}${color_light_cyan}"
+    dig +noall +answer "$1" "${t}"
+    echo -e "${color_restore}"
+  done
+fi
