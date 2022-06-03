@@ -6,15 +6,84 @@ declare -rx color_light_green='\033[1;32m'
 declare -rx color_light_blue='\033[1;34m'
 declare -rx color_light_cyan='\033[1;36m'
 
-if [ -z "$1" ]; then
-  echo -e "${color_red}Error: Please pass domain as first arg${color_restore}"
-else
-  echo -e "${color_light_blue}Queries: (dig +noall +answer '$1' '<type>')...${color_light_cyan}\n"
-  # Note that CNAME doesn't work, which is why it's not here.
-  # CNAME isn't needed because it will show up as the other record types
-  for t in SOA NS SPF TXT MX AAAA A; do
-    echo -e "${color_light_green}Querying for $t records...${color_restore}${color_light_cyan}"
-    dig +noall +answer "$1" "${t}"
-    echo -e "${color_restore}"
+print_usage()
+{
+  local oldifs="${IFS}"
+  IFS='%'
+  while read -r line; do echo -e $line; done <<EOF
+  ${color_light_cyan}
+  'digall' will run the 'dig' command for every record type against the host or domain that you specify.
+
+  You can optionally pass -s or --show to see the dig command printed out.
+  ${color_light_green}
+  Examples:
+
+      digall google.com
+      digall mail.google.com
+
+      digall -s google.com
+      digall -s mail.google.com
+  ${color_restore}
+EOF
+  IFS="${oldifs}"
+}
+
+digcom_command()
+{
+  local hostname="${1}"
+  local type="${2}"
+  echo "dig +noall +answer '${hostname}' '${type}'"
+}
+
+digcom()
+{
+  local hostname="${1}"
+  local type="${2}"
+  dig +noall +answer "${hostname}" "${type}"
+}
+
+main()
+{
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      -h|--help)
+        print_usage
+        exit 1
+        ;;
+      -s|--show)
+        local digall_show_dig_command='Yes'
+        shift
+        ;;
+      *)
+        local digall_hostname="$1"
+        shift
+        ;;
+    esac
   done
-fi
+
+  if [ -z "${digall_hostname}" ]; then
+    echo -e "${color_red}Error: Please pass hostname/domain as first arg\n"
+    echo -e "  Example: digall mail.google.com${color_restore}"
+  else
+    # CNAME isn't needed because it will show up under the other record types
+    if [ "${digall_show_dig_command}" = 'Yes' ]; then
+      for t in SOA NS SPF TXT MX AAAA A; do
+        echo -e "${color_light_green}Querying for ${t} records...${color_restore}"
+        echo -e "${color_light_blue}  $(digcom_command "${digall_hostname}" "${t}")${color_restore}"
+        echo -e "${color_light_cyan}"
+        digcom "${digall_hostname}" "${t}"
+        echo -e "${color_restore}"
+      done
+    else
+      echo -e "${color_light_blue}Queries: ($(digcom_command "${digall_hostname}" '<type>'))...${color_restore}\n"
+      # CNAME isn't needed because it will show up as the other record types
+      for t in SOA NS SPF TXT MX AAAA A; do
+        echo -e "${color_light_green}Querying for ${t} records...${color_light_cyan}"
+        digcom "${digall_hostname}" "${t}"
+        echo -e "${color_restore}"
+      done
+    fi
+  fi
+}
+
+main "$@"

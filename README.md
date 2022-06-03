@@ -1,6 +1,9 @@
 # digall
 
-You have a few different options for how you can run it
+You have a few different options for how you can run it.  The "script" version
+(Option 1) is a little more complete.  It has a help message (`-h|--help`) and
+supports a `-s|--show` argument that will print out the dig command that it's
+using, which is useful for learning.
 
 ## Option 1:  Install as a script
 
@@ -14,8 +17,19 @@ wget https://raw.githubusercontent.com/FreedomBen/digall/main/digall \
 Now use it with whatever domains you like:
 
 ```bash
-./digall.sh example.com
-./digall.sh something.example.com
+./digall example.com
+./digall something.example.com
+```
+
+If you add it to [somewhere in your `$PATH` variable](https://opensource.com/article/17/6/set-path-linux) then you can invoke it without the `./` prefix:
+
+```bash
+# Install in /usr/local/bin
+sudo curl -L https://raw.githubusercontent.com/FreedomBen/digall/main/digall -o "/usr/local/bin/digall"
+sudo chmod +x /usr/local/bin/digall
+
+# assumes that /usr/local/bin is in the $PATH
+digall example.com
 ```
 
 ## Option 2:  As a bash function temporarily
